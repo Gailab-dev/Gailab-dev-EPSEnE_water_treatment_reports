@@ -1,0 +1,117 @@
+# 내부 파일
+.claude
+.models
+.docs
+.env
+.agent
+
+# Git 추적용 빈 디렉토리 마커는 추적 대상으로 유지 (.gitkeep은 제외하지 않음)
+
+# 설계 문서 (대용량 PDF 및 내부 문서)
+docs/
+lab/
+
+# EDA 결과물 (이미지·CSV)
+ml/00_eda/outputs/
+
+# 학습된 모델 파일
+# *.pkl
+*.pt
+*.pth
+*.onnx
+*.h5
+*.bin
+
+# MLflow / 실험 추적
+mlruns/
+mlartifacts/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+.pytest_cache/
+
+# 가상환경
+.venv/
+venv/
+env/
+.conda/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 환경 변수
+.env
+.env.*
+!.env.example
+
+# 로그 / 임시 파일
+*.log
+*.tmp
+*.cache
+logs/
+tmp/
+
+# ==========================
+# 데이터 파일
+# ==========================
+
+# 대용량 데이터 파일
+*.csv
+*.feather
+dataset/덕남_소독공정_1분_v2.parquet
+dataset/덕남_응집제공정_1분.parquet
+dataset/용연_소독공정_1분.parquet
+dataset/용연_응집제공정_1분.parquet
+
+# 필요 시 활성화
+# *.parquet
+
+# ==========================
+# _yongyeon
+# ==========================
+
+_yongyeon/data/
+_yongyeon/dataset/
+
+_yongyeon/ml/01_clustering/outputs/experiments/
+_yongyeon/ml/01_clustering/outputs/final_clustered/
+_yongyeon/ml/01_clustering/docs/md/
+_yongyeon/ml/01_clustering/preprocessed/
+
+# ==========================
+# _deoknam
+# ==========================
+
+_deoknam/data/
+_deoknam/dataset/
+
+_deoknam/ml/01_clustering/outputs/experiments/
+_deoknam/ml/01_clustering/outputs/final_clustered/
+_deoknam/ml/01_clustering/docs/md/
+_deoknam/ml/01_clustering/preprocessed/
+
+# ==========================
+# .gitkeep 유지
+# ==========================
+
+!_yongyeon/ml/01_clustering/outputs/.gitkeep
+!_deoknam/ml/01_clustering/outputs/.gitkeep

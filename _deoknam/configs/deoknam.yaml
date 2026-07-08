@@ -1,0 +1,26 @@
+# 덕남 정수장 사이트 설정 (골격)
+# HMI/SCADA 태그·안전 제약·모델 파라미터를 이 파일에 채웁니다.
+plant_id: deoknam
+
+# HMI/SCADA 태그 매핑 (예시 키 — 실제 태그명으로 채우세요)
+tags:
+  raw_turbidity: ""       # 원수 탁도
+  raw_ph: ""              # 원수 pH
+  raw_temperature: ""     # 원수 수온
+  raw_alkalinity: ""      # 원수 알칼리도
+  coagulant_dose: ""      # 응집제 주입률
+  settled_turbidity: ""   # 침전수 탁도 (덕남: 피드백 기반 역산)
+
+# 안전 제약 (운영 한계 — 실제 값으로 채우세요)
+safety:
+  coagulant_dose_min: null
+  coagulant_dose_max: null
+  dose_change_rate_limit: null
+
+# 모델 파라미터
+models:
+  cluster:
+    n_clusters: 3
+    algorithm: GMM        # 덕남 군집: water_quality_only 기준
+  mixing:
+    method: mechanical    # 덕남: 단일 기계식 급속혼화 (Letterman)

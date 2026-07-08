@@ -1,0 +1,19 @@
+# 덕남 정수장 독립 서버 (단일 서비스)
+services:
+  api-deoknam:
+    image: "epsene-deoknam:${VERSION:-latest}"
+    container_name: epsene-deoknam
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    ports:
+      - "${API_PORT:-8001}:8001"
+    env_file:
+      - ../.env
+    environment:
+      - PLANT_ID=deoknam
+    volumes:
+      - ../models:/app/models:ro
+      - ../dataset:/app/dataset:ro
+      - ../logs:/app/logs
+    restart: unless-stopped

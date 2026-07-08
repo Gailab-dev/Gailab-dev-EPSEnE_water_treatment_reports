@@ -1,0 +1,19 @@
+# 용연 정수장 독립 서버 (단일 서비스)
+services:
+  api-yongyeon:
+    image: "epsene-yongyeon:${VERSION:-latest}"
+    container_name: epsene-yongyeon
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    ports:
+      - "${API_PORT:-8002}:8002"
+    env_file:
+      - ../.env
+    environment:
+      - PLANT_ID=yongyeon
+    volumes:
+      - ../models:/app/models:ro
+      - ../dataset:/app/dataset:ro
+      - ../logs:/app/logs
+    restart: unless-stopped

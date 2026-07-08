@@ -1,0 +1,27 @@
+# 용연 정수장 사이트 설정 (골격)
+# HMI/SCADA 태그·안전 제약·모델 파라미터를 이 파일에 채웁니다.
+plant_id: yongyeon
+
+# HMI/SCADA 태그 매핑 (예시 키 — 실제 태그명으로 채우세요)
+tags:
+  raw_turbidity: ""       # 원수 탁도
+  raw_ph: ""              # 원수 pH
+  raw_temperature: ""     # 원수 수온
+  raw_alkalinity: ""      # 원수 알칼리도
+  raw_flow: ""            # 유입 유량 (용연: with_flow 변형에 사용)
+  coagulant_dose: ""      # 응집제 주입률 (용연: Jar-Test 기반 직접 예측)
+  floc_index: ""          # 플록 분석 장비 피드백
+
+# 안전 제약 (운영 한계 — 실제 값으로 채우세요)
+safety:
+  coagulant_dose_min: null
+  coagulant_dose_max: null
+  dose_change_rate_limit: null
+
+# 모델 파라미터
+models:
+  cluster:
+    n_clusters: 3
+    algorithm: GMM        # 용연 군집: water_quality_only / water_quality_with_flow
+  mixing:
+    method: selectable    # 용연: 복수 혼화 방식 선택 + 플록 분석 피드백

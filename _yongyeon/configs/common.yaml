@@ -1,0 +1,12 @@
+# 공통 설정 (골격) — 사이트별로 복제되어 독립 운영된다.
+database:
+  url: "mysql+aiomysql://root:password@localhost:3306/yongyeon"
+
+api:
+  host: "0.0.0.0"
+  port: 8002
+  api_key: "change-me"
+
+retrain:
+  enabled: false
+  schedule: "0 3 * * 0"   # 매주 일요일 03:00 (cron)

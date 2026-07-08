@@ -1,0 +1,10 @@
+# 덕남 정수장 서버 + ML 의존성 (골격 — 버전은 운영 환경에 맞춰 고정하세요)
+fastapi
+uvicorn[standard]
+pydantic-settings
+pyyaml
+pandas
+pyarrow
+scikit-learn
+joblib
+numpy
