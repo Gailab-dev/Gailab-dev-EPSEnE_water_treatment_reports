@@ -146,6 +146,26 @@ EPSEnE_water_treatment/
 
 ---
 
+## 핵심 API(변경 예정)
+
+각 사이트 서버는 자기 정수장만 담당하므로 경로에 정수장 식별자가 없습니다.
+
+| API | Method | 기능 |
+|---|---|---|
+| `/health` | GET | 헬스 체크 (plant_id 반환) |
+| `/api/v1/cluster/classify` | POST | 유입수 군집 분류 |
+| `/api/v1/models/predict/coagulant` | POST | 응집제 주입률 예측 |
+| `/api/v1/models/predict/mixing` | POST | G값/RPM 예측 |
+| `/api/v1/models/predict/chlorine` | POST | 염소 주입률 예측 |
+| `/api/v1/recommendations/latest` | GET | 최신 AI 권고값 조회 |
+| `/api/v1/recommendations/approve` | POST | 운영자 승인 |
+| `/api/v1/simulation/what-if` | POST | 운영조건 변경 시뮬레이션 |
+| `/api/v1/anomaly/latest` | GET | 최신 이상탐지 결과 |
+| `/api/v1/xai/{prediction_id}` | GET | XAI 설명 조회 |
+| `/api/v1/mlops/retrain` | POST | 모델 재학습 실행 |
+| `/api/v1/mlops/rollback` | POST | 이전 모델 롤백 |
+
+---
 
 ## 인프라 구성
 

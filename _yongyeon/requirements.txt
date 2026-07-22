@@ -8,3 +8,7 @@ pyarrow
 scikit-learn
 joblib
 numpy
+
+# 테스트
+pytest
+httpx

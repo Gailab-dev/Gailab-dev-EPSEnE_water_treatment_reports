@@ -1,0 +1,19 @@
+{
+  "plant_key": "deoknam",
+  "plant_name": "덕남",
+  "prefix": "덕남",
+  "input_path": "dataset/덕남_응집제공정_소독공정_통합.parquet",
+  "datetime_column": "datetime",
+  "raw_water_features": {
+    "turbidity": "RCS_6.AI.착수정_TB",
+    "ph": "RCS_6.AI.착수정_PH",
+    "alkalinity": "RCS_6.AI.착수정_AL",
+    "temperature": "RCS_6.AI.착수정_온도",
+    "conductivity": "RCS_6.AI.착수정_전기전도도"
+  },
+  "outputs": {
+    "dataset": "_deoknam/ml/00_preprocess_outlier/output/dataset/덕남_응집제공정_소독공정_통합_1차이상치처리.parquet",
+    "report": "_deoknam/ml/00_preprocess_outlier/output/report/덕남_1차이상치처리_리포트.md",
+    "log": "_deoknam/ml/00_preprocess_outlier/output/log/덕남_stage1_correction_log.csv"
+  }
+}

@@ -9,11 +9,18 @@ services:
     ports:
       - "${API_PORT:-8001}:8001"
     env_file:
-      - ../.env
+      # required: false 는 docker compose v2.24+ — 구버전이면 사이트 루트에 `touch .env`
+      - path: ../.env
+        required: false
     environment:
       - PLANT_ID=deoknam
     volumes:
       - ../models:/app/models:ro
       - ../dataset:/app/dataset:ro
       - ../logs:/app/logs
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     restart: unless-stopped

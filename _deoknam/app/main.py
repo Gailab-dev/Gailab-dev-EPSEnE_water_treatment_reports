@@ -11,6 +11,7 @@ import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 
@@ -37,16 +38,26 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# mock 단계: 발주처 호출 주체(브라우저/서버)가 미정이라 전체 허용.
+# 운영 전환 시 allow_origins 를 발주처 도메인으로 좁힐 것.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.get("/health")
 async def health() -> dict:
     return {"status": "ok", "plant_id": settings.PLANT_ID}
 
 
-# TODO: 라우터 등록
-# from app.api import routers
-# for r in routers:
-#     app.include_router(r)
+from app.api import register_error_handlers, routers
+
+for r in routers:
+    app.include_router(r)
+register_error_handlers(app)
 
 
 if __name__ == "__main__":

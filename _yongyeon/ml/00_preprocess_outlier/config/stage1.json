@@ -1,0 +1,19 @@
+{
+  "plant_key": "yongyeon",
+  "plant_name": "용연",
+  "prefix": "용연",
+  "input_path": "dataset/용연_응집제공정_소독공정_통합.parquet",
+  "datetime_column": "datetime",
+  "raw_water_features": {
+    "turbidity": "원수 탁도",
+    "ph": "원수 PH",
+    "alkalinity": "원수 알카리도",
+    "temperature": "원수 온도",
+    "conductivity": "원수 전기전도도"
+  },
+  "outputs": {
+    "dataset": "_yongyeon/ml/00_preprocess_outlier/output/dataset/용연_응집제공정_소독공정_통합_1차이상치처리.parquet",
+    "report": "_yongyeon/ml/00_preprocess_outlier/output/report/용연_1차이상치처리_리포트.md",
+    "log": "_yongyeon/ml/00_preprocess_outlier/output/log/용연_stage1_correction_log.csv"
+  }
+}

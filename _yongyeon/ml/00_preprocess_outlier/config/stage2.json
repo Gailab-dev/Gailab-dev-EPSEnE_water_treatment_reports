@@ -1,0 +1,17 @@
+{
+  "plant_key": "yongyeon",
+  "plant_name": "용연",
+  "prefix": "용연",
+  "datetime_column": "datetime",
+  "raw_water_features": {
+    "turbidity": "원수 탁도",
+    "ph": "원수 PH",
+    "alkalinity": "원수 알카리도",
+    "temperature": "원수 온도",
+    "conductivity": "원수 전기전도도"
+  },
+  "input_template": "_yongyeon/ml/01_clustering/output/dataset/용연_cluster{cluster}.parquet",
+  "output_template": "_yongyeon/ml/00_preprocess_outlier/output/stage2/용연_cluster{cluster}_stage2_outlier.parquet",
+  "report_template": "_yongyeon/ml/00_preprocess_outlier/output/stage2_report/용연_cluster{cluster}_2차이상치처리_리포트.md",
+  "log_path": "_yongyeon/ml/00_preprocess_outlier/output/stage2_log/용연_stage2_removed_rows.csv"
+}
