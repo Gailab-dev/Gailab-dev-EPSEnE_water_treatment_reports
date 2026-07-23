@@ -81,9 +81,11 @@ dataset/덕남_소독공정_1분_v2.parquet
 dataset/덕남_응집제공정_1분.parquet
 dataset/용연_소독공정_1분.parquet
 dataset/용연_응집제공정_1분.parquet
+*.dataset
+*.results
 
 # 필요 시 활성화
-# *.parquet
+*.parquet
 
 # ==========================
 # _yongyeon
