@@ -26,7 +26,15 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     logger.info("Starting %s plant API", settings.PLANT_ID)
     logger.info("Model base path: %s", settings.MODEL_BASE_PATH)
-    # TODO: 이 정수장의 군집 분류기·공정별 모델 로드
+    # 군집 분류기(KMeans k=3) 로드 + step_aiwtp DB 워밍업 (실패해도 서버는 뜨고 엔드포인트는 폴백)
+    try:
+        from app.services import clustering
+        st = clustering.load_state()
+        clustering.get_engine().connect().close()
+        logger.info("군집 모델 로드 OK: raw_cols=%s, window=%s",
+                    st["bundle"]["raw_cols"], st["bundle"]["window"])
+    except Exception as e:  # noqa: BLE001
+        logger.warning("군집 모델/DB 초기화 실패(엔드포인트는 mock 폴백): %s", e)
     yield
     logger.info("Shutting down %s plant API", settings.PLANT_ID)
 

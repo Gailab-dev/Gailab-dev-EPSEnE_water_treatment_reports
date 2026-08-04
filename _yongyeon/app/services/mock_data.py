@@ -209,13 +209,23 @@ _ANALYSIS_CONTENT: dict[tuple[str, str], dict] = {
     ("intake", "cluster"): {
         "metrics": [
             {"key": "cluster_id", "value": 2, "unit": "-"},
+            {"key": "cluster_label", "value": "C2", "unit": "-"},
             {"key": "influent_turbidity", "value": 6.9, "unit": "NTU"},
             {"key": "cluster_probability", "value": 0.91, "unit": "-"},
+            {"key": "manganese", "value": 0.024, "unit": "mg/L"},
+            {"key": "algae", "value": 5800, "unit": "cells/mL"},
+            {"key": "current_dose", "value": 29.8, "unit": "mg/L"},
+            {"key": "recommended_dose", "value": 32.0, "unit": "mg/L"},
         ],
         "chart": {"type": "cluster", "x": "influent_turbidity", "y": "raw_ph",
                   "points": [{"x": 6.8, "y": 7.1, "cluster": 2}, {"x": 5.4, "y": 7.0, "cluster": 1},
-                             {"x": 9.2, "y": 6.9, "cluster": 3}]},
-        "recommendation": {"value": 2, "basis": "GMM 군집 분석 결과 현재 원수는 군집 C2(평수기 중탁도)에 속함"},
+                             {"x": 9.2, "y": 6.9, "cluster": 0}],
+                  "clusters": [
+                      {"cluster_id": 0, "meaning": "저탁도·저수온(겨울형)", "turbidity_mean": 1.47, "ph_mean": 7.22, "temp_mean": 8.5},
+                      {"cluster_id": 1, "meaning": "중간(전이기)", "turbidity_mean": 1.51, "ph_mean": 7.11, "temp_mean": 12.8},
+                      {"cluster_id": 2, "meaning": "고탁도·고수온(여름형)", "turbidity_mean": 2.10, "ph_mean": 6.91, "temp_mean": 18.0}]},
+        "recommendation": {"value": 2, "cluster_label": "C2",
+                           "basis": "GMM 군집 분석 결과 현재 원수는 군집 C2(평수기 중탁도)에 속함 (mock)"},
     },
     ("intake", "raw_water_recommendation"): {
         "metrics": [
@@ -229,16 +239,21 @@ _ANALYSIS_CONTENT: dict[tuple[str, str], dict] = {
     ("coagulation", "scatter"): {
         "metrics": [
             {"key": "g_value", "value": 720, "unit": "s⁻¹"},
+            {"key": "target_g_value", "value": 760, "unit": "s⁻¹"},
+            {"key": "recommended_rpm", "value": 145, "unit": "rpm"},
             {"key": "sed_turbidity_corr", "value": -0.63, "unit": "-"},
         ],
         "chart": {"type": "scatter", "x": "g_value", "y": "sed_turbidity_1",
-                  "points": [{"x": 700, "y": 2.1}, {"x": 720, "y": 1.8}, {"x": 745, "y": 1.5}]},
-        "recommendation": {"value": 745, "basis": "군집/산포 분석 결과 G값 745 s⁻¹ 부근에서 침전탁도 최소"},
+                  "points": [{"x": 700, "y": 2.1}, {"x": 720, "y": 1.8}, {"x": 760, "y": 1.5}]},
+        "recommendation": {"value": 145, "unit": "rpm", "target_g_value": 760,
+                           "basis": "목표 G값 760 s⁻¹ 도달을 위한 권장 RPM 145"},
     },
     ("coagulation", "mixer_control"): {
         "metrics": [
             {"key": "rpm", "value": 142, "unit": "rpm"},
+            {"key": "recommended_rpm", "value": 145, "unit": "rpm"},
             {"key": "g_value", "value": 720, "unit": "s⁻¹"},
+            {"key": "target_g_value", "value": 760, "unit": "s⁻¹"},
             {"key": "floc_index", "value": 0.82, "unit": "-"},
         ],
         "chart": {"type": "line", "series": ["rpm", "floc_index"],
@@ -250,7 +265,12 @@ _ANALYSIS_CONTENT: dict[tuple[str, str], dict] = {
     ("sedimentation", "efficiency"): {
         "metrics": [
             {"key": "removal_efficiency", "value": 73.9, "unit": "%"},
+            {"key": "target_removal_efficiency", "value": 75.0, "unit": "%"},
             {"key": "sed_turbidity_1", "value": 1.8, "unit": "NTU"},
+            {"key": "measured_turbidity", "value": 0.36, "unit": "NTU"},
+            {"key": "predicted_turbidity", "value": 0.33, "unit": "NTU"},
+            {"key": "target_turbidity", "value": 0.30, "unit": "NTU"},
+            {"key": "deviation", "value": 0.03, "unit": "NTU"},
         ],
         "chart": {"type": "bar", "x": "basin", "y": "removal_efficiency",
                   "points": [{"x": "1계열", "y": 73.9}, {"x": "2계열", "y": 76.2}]},
@@ -268,6 +288,9 @@ _ANALYSIS_CONTENT: dict[tuple[str, str], dict] = {
     ("filtration", "default"): {
         "metrics": [
             {"key": "filt_turbidity_1", "value": 0.08, "unit": "NTU"},
+            {"key": "predicted_turbidity", "value": 0.09, "unit": "NTU"},
+            {"key": "residual_chlorine", "value": 0.18, "unit": "mg/L"},
+            {"key": "target_turbidity", "value": 0.10, "unit": "NTU"},
             {"key": "run_time_since_backwash", "value": 42, "unit": "h"},
         ],
         "chart": {"type": "line", "series": ["filter_head_loss"],
@@ -278,6 +301,9 @@ _ANALYSIS_CONTENT: dict[tuple[str, str], dict] = {
         "metrics": [
             {"key": "post_cl_dose_rate", "value": 0.28, "unit": "mg/L"},
             {"key": "residual_chlorine_1", "value": 0.21, "unit": "mg/L"},
+            {"key": "predicted_residual", "value": 0.16, "unit": "mg/L"},
+            {"key": "target_range", "value": "0.20~0.50", "unit": "mg/L"},
+            {"key": "after_apply", "value": 0.21, "unit": "mg/L"},
         ],
         "chart": {"type": "line", "series": ["residual_chlorine_1"],
                   "points": [{"t": "-2h", "v": 0.23}, {"t": "-1h", "v": 0.22}, {"t": "0h", "v": 0.21}]},
@@ -287,6 +313,9 @@ _ANALYSIS_CONTENT: dict[tuple[str, str], dict] = {
         "metrics": [
             {"key": "clear_turbidity_1", "value": 0.07, "unit": "NTU"},
             {"key": "residual_chlorine_out", "value": 0.22, "unit": "mg/L"},
+            {"key": "target_turbidity", "value": 0.10, "unit": "NTU"},
+            {"key": "target_range", "value": "0.20~0.50", "unit": "mg/L"},
+            {"key": "linkage", "value": "소독 권고값 확인", "unit": "-"},
         ],
         "chart": {"type": "line", "series": ["clear_turbidity_1"],
                   "points": [{"t": "-2h", "v": 0.07}, {"t": "-1h", "v": 0.07}, {"t": "0h", "v": 0.07}]},
@@ -296,7 +325,17 @@ _ANALYSIS_CONTENT: dict[tuple[str, str], dict] = {
 
 
 def analysis_payload(process: str, analysis_type: str) -> dict:
-    content = _ANALYSIS_CONTENT[(process, analysis_type)]
+    # 착수 군집 분석은 실 KMeans 모델 + 실 DB 최근 원수성상으로 산출(실패 시 mock 폴백)
+    if (process, analysis_type) == ("intake", "cluster"):
+        try:
+            from app.services import clustering
+            content = clustering.cluster_analysis_payload()
+        except Exception as e:  # noqa: BLE001
+            import logging
+            logging.getLogger(__name__).warning("군집 실산출 실패 — mock 폴백: %s", e)
+            content = _ANALYSIS_CONTENT[(process, analysis_type)]
+    else:
+        content = _ANALYSIS_CONTENT[(process, analysis_type)]
     return {
         "process": process,
         "analysis_type": analysis_type,

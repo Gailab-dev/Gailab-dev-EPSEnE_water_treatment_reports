@@ -9,6 +9,10 @@ scikit-learn
 joblib
 numpy
 
+# 군집 실모델 DB 연동 (step_aiwtp MySQL)
+sqlalchemy
+pymysql
+
 # 테스트
 pytest
 httpx

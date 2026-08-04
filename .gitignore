@@ -58,6 +58,9 @@ env/
 Thumbs.db
 desktop.ini
 
+# Isolated agent worktrees
+.worktrees/
+
 # 환경 변수
 .env
 .env.*
@@ -81,11 +84,9 @@ dataset/덕남_소독공정_1분_v2.parquet
 dataset/덕남_응집제공정_1분.parquet
 dataset/용연_소독공정_1분.parquet
 dataset/용연_응집제공정_1분.parquet
-*.dataset
-*.results
 
 # 필요 시 활성화
-*.parquet
+# *.parquet
 
 # ==========================
 # _yongyeon
@@ -117,3 +118,16 @@ _deoknam/ml/01_clustering/preprocessed/
 
 !_yongyeon/ml/01_clustering/outputs/.gitkeep
 !_deoknam/ml/01_clustering/outputs/.gitkeep
+# 덕남 모델 개발 대용량 데이터 (raw/전처리/군집 parquet)
+_deoknam/덕남 모델 개발/dataset/
+# 용연 모델 개발 대용량 데이터 (raw/전처리/군집 parquet)
+_yongyeon/용연 모델 개발/dataset/
+# 대용량 산출물 (GitHub 100MB 제한·저장소 비대화 방지)
+_deoknam/덕남 모델 개발/06_floc_rpm/output/*.parquet
+_deoknam/덕남 모델 개발/착수공정/output/models/
+_deoknam/덕남 모델 개발/착수공정/output/*.parquet
+# API 연동 시험용 더미데이터 (저장소 비공개 대상)
+더미데이터/
+# 혼화응집공정 실측 데이터 (발주처 데이터 — 저장소 제외)
+_deoknam/덕남 모델 개발/혼화응집공정/dataset/
+_yongyeon/용연 모델 개발/혼화응집공정/dataset/

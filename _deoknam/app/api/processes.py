@@ -60,6 +60,7 @@ async def monitoring_forecast(
                 continue
         row.update({
             "unit": ind["unit"],
+            "target": ind.get("target"),
             "current": current_value(ind),
             "history": history_series(ind, points=24, interval=interval),
             "forecast": forecast_series(ind, points=horizon, interval=interval),
@@ -79,6 +80,8 @@ async def recommendations_summary(process: Process) -> dict:
         else:
             row.pop("basin", None)
             row.pop("stage", None)
+        # 예측(권고 적용 시 예상 결과) 필드 — 화면 '예측' 칸용
+        row.setdefault("predicted_value", row.get("recommended_value"))
         recos.append(row)
     return envelope({
         "process": process.value,

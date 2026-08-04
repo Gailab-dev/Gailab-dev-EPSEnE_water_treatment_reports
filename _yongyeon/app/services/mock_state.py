@@ -182,20 +182,27 @@ class MockState:
                 "process": proc,
                 "version": ver,
                 "deploy_status": "active",
-                "metrics": {"MAE": 0.03, "R2": 0.91},
+                # accuracy(%, 높을수록 우수) = 100 − MAPE (더미데이터 ACRC_RT 관례)
+                "metrics": {"MAE": 0.03, "RMSE": 0.05, "R2": 0.91, "MAPE": 4.6, "accuracy": 95.4},
                 "rollback_point": None,
                 "candidates": [],
             }
-        cand = self.new_id("CAND")
-        self.models["MDL-DISF-01"]["candidates"].append({
-            "candidate_id": cand,
-            "version": "1.5.0-rc1",
-            "metrics": {"MAPE": 4.6},
-            "baseline_metrics": {"MAPE": 5.2},
-            "improvement": {"MAPE": -0.6},
-            "evaluated_at": _iso(now - timedelta(hours=28)),
-            "status": "evaluated",
-        })
+        # 6개 모델 전부 재학습 후보 1건씩 seed (개선폭·정확도·배포대상 포함)
+        for mid, name, proc, ver in _seed_models:
+            base_mape = 5.2
+            cand_mape = 4.6
+            self.models[mid]["candidates"].append({
+                "candidate_id": self.new_id("CAND"),
+                "version": f"{ver.rsplit('.', 1)[0]}.{int(ver.rsplit('.', 1)[1]) + 1}-rc1",
+                "process": proc,
+                "deploy_target": proc,
+                "metrics": {"MAPE": cand_mape, "accuracy": round(100 - cand_mape, 1)},
+                "baseline_metrics": {"MAPE": base_mape, "accuracy": round(100 - base_mape, 1)},
+                "improvement": {"MAPE": round(cand_mape - base_mape, 1),
+                                "accuracy": round(base_mape - cand_mape, 1)},
+                "evaluated_at": _iso(now - timedelta(hours=28)),
+                "status": "evaluated",
+            })
 
         self.retraining_jobs: list[dict] = [
             {"job_id": self.new_id("JOB"), "model_id": "MDL-DISF-01", "trigger": "drift",

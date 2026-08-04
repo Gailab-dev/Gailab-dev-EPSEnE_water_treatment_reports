@@ -53,6 +53,14 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "mysql+aiomysql://root:password@localhost:3306/deoknam"
     API_KEY: str = "change-me"
 
+    # 군집 실모델용 step_aiwtp DB — 값은 환경변수 WTP_DB_* 또는 .env로만 주입.
+    # 소스에 자격증명을 두지 말 것(미설정 시 API는 mock 폴백). .env.example 참고.
+    WTP_DB_HOST: str = ""
+    WTP_DB_PORT: int = 44306
+    WTP_DB_USER: str = ""
+    WTP_DB_PASSWORD: str = ""
+    WTP_DB_NAME: str = ""
+
     LOG_LEVEL: str = "INFO"
     LOG_FORMAT: str = "%(asctime)s %(levelname)s %(name)s %(message)s"
 
@@ -73,3 +81,25 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
+
+# --- 군집 실모델 연동 상수 (덕남) ---
+_MODEL_ROOT = SITE_ROOT / "덕남 모델 개발" / "01_clustering" / "output"
+CLUSTER_MODEL_PATH = _MODEL_ROOT / "model" / "덕남_kmeans_k3.joblib"
+CLUSTER_CENTERS_PATH = _MODEL_ROOT / "cluster_centers.csv"
+
+MEASR_TABLE = "WTP_WIDE_MEASR_DK"      # 실측 원수성상(1분)
+SMLT_TABLE = "WTP_SMLT_HSTRY"          # 알칼리도·전기전도도(현재 0행 — 채워지면 우선 사용)
+LCLGV_CD = "2915"                       # 덕남 지자체코드
+
+# DB 계측코드 → 군집 raw_cols(학습 컬럼명)
+DB2RAW = {
+    "INT_TRBD": "RCS_6.AI.착수정_TB",
+    "INT_PH": "RCS_6.AI.착수정_PH",
+    "INT_WTMP": "RCS_6.AI.착수정_온도",
+}
+# WIDE에 없는 2성상: 학습 중앙값(parquet p50)
+MISSING_FILL = {"RCS_6.AI.착수정_AL": 21.45, "RCS_6.AI.착수정_전기전도도": 75.67}
+# SMLT_HSTRY 대응 컬럼(있으면 우선)
+SMLT_COLS = {"RCS_6.AI.착수정_AL": "ALKLNT", "RCS_6.AI.착수정_전기전도도": "ELCDT"}
+# 군집 의미(01_clustering cluster0=저탁도 규약, 온도로 계절 분리)
+CLUSTER_MEANINGS = {0: "저탁도·저수온(겨울형)", 1: "중간(전이기)", 2: "고탁도·고수온(여름형)"}

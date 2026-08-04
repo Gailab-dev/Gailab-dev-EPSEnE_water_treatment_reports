@@ -79,6 +79,18 @@ EPSEnE_water_treatment/
 │   │   ├── process_prediction/
 │   │   └── anomaly_detection/
 │   │
+│   ├── 덕남 모델 개발/              # ★ 모델 개발 작업 공간 (오프라인 분석·학습 — 진행 중 산출물)
+│   │   ├── 00_preprocessing/        # 이상치 처리·칼만 평활 → 전처리완료 parquet
+│   │   ├── 01_clustering/           # 원수 성상 군집분석 (K-Means k=3)
+│   │   ├── 02_coag/                 # 침전탁도 예측(coag) + 주입률 SV 비교모델(dose_compare)
+│   │   ├── 03_dose_recommend/       # 응집제 주입률 추천·백테스트
+│   │   ├── 04_dose_mimic/           # 운전자 주입 모방 모델
+│   │   ├── 05_mixing_gvalue/        # 교반강도 G값·RPM 산정 (K0 캘리브레이션 모델)
+│   │   ├── 06_floc_rpm/             # 혼화·플록형성 G/RPM 규칙기반 추천엔진 (설계문서 §5~12 구현)
+│   │   ├── db/                      # step_aiwtp MySQL 연동 (config/connection/loader)
+│   │   ├── 착수공정/                # 응집공정 모델(intake_coag) + 설계문서
+│   │   └── 혼화응집공정/            # G/RPM 추천·제어 상세설계문서
+│   │
 │   ├── dataset/                     # 덕남 학습 데이터 (덕남_*.parquet, .gitignore 대상)
 │   ├── docker/                      # Dockerfile.api + docker-compose.yml (단일 서비스)
 │   ├── mlops/                       # 학습·평가·레지스트리·드리프트·롤백
@@ -89,9 +101,8 @@ EPSEnE_water_treatment/
 │
 ├── _yongyeon/                       # ── 용연 정수장 독립 서버 트리 ──
 │   └── ...                          # 덕남과 동일 구조, 용연 전용 콘텐츠
-│                                    #  · 응집제
-│                                    #  · 혼화
-│                                    #  · 군집
+│                                    #  · 용연 모델 개발/ (00 전처리 · 01 군집 ·
+│                                    #    02 응집제 · 03 추천 · 05 G값 · db 미러)
 │
 ├── static/                          # UI 프로토타입 (공유 참고)
 │   └── AI정수장 화면설계.html
@@ -110,7 +121,7 @@ EPSEnE_water_treatment/
 
 | 항목 | 덕남정수장 | 용연정수장 |
 |---|---|---|
-| 혼화 방식 | 기계식 급속혼화 (단일) | 복수 혼화방식 선택 가능 |
+| 혼화 방식 | 착수정 낙차부 수류혼화 (기계식 혼화기 12대 현재 미사용) | 복수 혼화방식 선택 가능 |
 | 응집플록분석장치 | 없음 | 있음 |
 | 자동화 적합성 | 중간 | 높음 |
 | 초기 모델 전략 | 침전수 탁도 피드백 기반 역산 | 추후 기입 예정 |
@@ -138,32 +149,62 @@ EPSEnE_water_treatment/
 | 모델 | 알고리즘 | 입력 | 출력 |
 |---|---|---|---|
 | 군집분류기 | K-Means | 원수 탁도·pH·수온·EC·알칼리도·TOC | 군집 레이블 |
-| 응집제 주입률 | XGBoost / LightGBM | 원수 수질, 유량, 군집 레이블 | 응집제 권고 주입률 (ppm) |
-| G값/RPM | Letterman 산식 + ML 보정 | 수온, 점도, 응집제 주입률, 군집 | 목표 G값, 권고 RPM |
+| 응집제 주입률 | XGBoost / RF / LSTM·GRU 비교 | 원수 수질, 유량, 군집 레이블 | 응집제 권고 주입률 (ppm) |
+| G값/RPM | 규칙기반 — 표준 RPM 룩업보간(표 2.3-13) + K0 물리모델 검산 | 수온, 유량, 목표 G(50/30/10) | 3단 플록큐레이터 권고 RPM, G·Gt, 사유코드 |
 | 소독 염소 | XGBoost / LSTM | 수온·TOC·Mn, 유량, HRT, 군집 | 전/중/후 염소 권고값 |
 | 수질 예측 | XGBoost / LSTM | 운영조건 + 약품 주입률 | 침전수·여과수·잔류염소 예측 |
 | 이상탐지 | Isolation Forest + Rule | 센서값, 운영이력, 군집 경계 | 이상 플래그, 군집 전이 경고 |
 
 ---
 
-## 핵심 API(변경 예정)
+## 모델 개발 현황
 
-각 사이트 서버는 자기 정수장만 담당하므로 경로에 정수장 식별자가 없습니다.
+오프라인 모델 개발은 `_deoknam/덕남 모델 개발/`(선행)과 `_yongyeon/용연 모델 개발/`(미러)에서
+진행합니다. 입력은 통합 parquet(1분 주기, 덕남 95만 행: 2024-05~2026-02)입니다.
 
-| API | Method | 기능 |
+| 모듈 | 내용 | 상태 |
 |---|---|---|
-| `/health` | GET | 헬스 체크 (plant_id 반환) |
-| `/api/v1/cluster/classify` | POST | 유입수 군집 분류 |
-| `/api/v1/models/predict/coagulant` | POST | 응집제 주입률 예측 |
-| `/api/v1/models/predict/mixing` | POST | G값/RPM 예측 |
-| `/api/v1/models/predict/chlorine` | POST | 염소 주입률 예측 |
-| `/api/v1/recommendations/latest` | GET | 최신 AI 권고값 조회 |
-| `/api/v1/recommendations/approve` | POST | 운영자 승인 |
-| `/api/v1/simulation/what-if` | POST | 운영조건 변경 시뮬레이션 |
-| `/api/v1/anomaly/latest` | GET | 최신 이상탐지 결과 |
-| `/api/v1/xai/{prediction_id}` | GET | XAI 설명 조회 |
-| `/api/v1/mlops/retrain` | POST | 모델 재학습 실행 |
-| `/api/v1/mlops/rollback` | POST | 이전 모델 롤백 |
+| `00_preprocessing` | 이상치 2단계 처리 + 칼만 평활 → 전처리완료 parquet | 덕남·용연 완료 |
+| `01_clustering` | 원수 성상 K-Means k=3 군집 (저탁도/중탁도/고탁도) | 덕남·용연 완료, API 실연동 |
+| `02_coag` | 응집제→침전탁도 예측(coag) + 주입률 SV 5모델 비교(dose_compare) | 덕남 완료, 용연 dose_compare 진행 |
+| `03_dose_recommend` | 군집별 응집제 주입률 추천 + 백테스트 | 덕남·용연 완료 |
+| `04_dose_mimic` | 운전자 주입 모방 모델 | 덕남 완료 |
+| `05_mixing_gvalue` | G=K0·√(ρ/μ)·rpm^1.5 캘리브레이션 — 기술진단서 표 재현 오차 <2% | 덕남·용연 완료 |
+| `06_floc_rpm` | 혼화·플록형성 3단 RPM 규칙기반 추천엔진 (아래 상세) | 덕남 완료 |
+| `착수공정` | 응집공정 체류시간 정렬·과제A/B 모델 (intake_coag) | 덕남 완료 |
+
+**06_floc_rpm — 혼화·플록형성 G/RPM 추천엔진** ([설계문서](_deoknam/덕남%20모델%20개발/혼화응집공정/설계문서.md) §5~12 구현):
+
+- 수온별 표준 RPM 룩업보간(표 2.3-13) + 목표 G^(2/3) 보정을 추천 기준으로,
+  05의 K0 물리모델은 독립 검산(편차 경보 3%)으로 이중화
+- 착수정 낙차부 수류혼화 G 감시(§8), 상류지연 시간정렬(§6.4), 상하한·점감·Gt
+  제약검사(§10.4), 사유코드 비트마스크(§15.3), FT101 단위 미확정 시 제어 차단(§6.1)
+- 검증: 단위시험 25건 통과, 전기간(950,286행) 백테스트 가용률 99.1%,
+  점감·한계 위반 0건 — 상세는 [06_floc_rpm README](_deoknam/덕남%20모델%20개발/06_floc_rpm/README.md)
+- 현재는 화면추천 전용(1~2단계). 인버터·RPM 실측 태그 연결 후 운전자 승인형
+  제어(3단계)로 확장
+
+---
+
+## 핵심 API
+
+WTP AI API **카탈로그 v0.2.5(61종) 전체 구현** 완료 (현재 mock 단계 — 유입수
+군집 분석은 실 DB·군집모델 연동, 나머지는 모의 데이터). 상세 설명은
+**[API_GUIDE.md](API_GUIDE.md)**, 접속 주소·Swagger·호출 예시는
+**[API_ACCESS_INFO.md](API_ACCESS_INFO.md)** 참고.
+
+- Base URL: `http://<host>:8001/api/v1/ai/deoknam` (덕남) · `:8002/api/v1/ai/yongyeon` (용연)
+- 응답 봉투: `{ "success", "data", "metadata": { "generated_at", "plant_id" } }`
+
+| 그룹 | 대표 엔드포인트 | 기능 |
+|---|---|---|
+| 상황판 | `GET /dashboard/recommendations` · `/dashboard/concentration-forecast` | 공정별 AI 추천 목록, 농도 시평별 예측(+1h/+3h/+6h) |
+| 공정 (6공정 공통) | `GET /processes/{process}/monitoring/forecast` · `/analysis` · `/operation-judgement` · `/anomaly-timeseries` · `/recommendations/summary` | 실측+예측, 분석진단(공정별 analysisType), XAI 판단근거, 이상탐지, 권고 요약 |
+| 권고 승인 | `GET /recommendations/pending` · `POST /recommendations/{id}/decision` · `GET /recommendations/decisions` | 승인 대기 목록, 승인/반려/보류, 결정 이력 |
+| 시뮬레이션 | `POST /simulations` · `GET /simulations/{id}` · `POST /simulations/{id}/apply` | 시나리오 실행·결과 조회·권고 생성 |
+| MLOps | `GET /models/current` · `/models/{id}/performance`·`/drift` · `POST /retraining/jobs` · `/models/{id}/deploy`·`/rollback` | 배포 모델·성능·드리프트, 재학습, 후보 승인·배포·롤백 |
+| 이벤트 | `GET /events` · `GET /events/stream`(SSE) · `PATCH /events/{id}/ack`·`/close` | 이벤트 목록·실시간 스트림·확인/종료 |
+| AI 모드 | `GET /ai-modes` · `PUT /processes/{process}/ai-mode` | 공정별 AI 운영모드 조회/변경 |
 
 ---
 
@@ -223,7 +264,11 @@ deoknam_cluster_classifier_20260517_v1.0.0
 
 ## 참고 문서
 
+- [API 설명서](API_GUIDE.md) · [API 접속 정보 (발주처 전달용)](API_ACCESS_INFO.md)
 - [덕남 사이트 안내](_deoknam/README.md) · [용연 사이트 안내](_yongyeon/README.md)
+- 설계문서: [혼화응집공정 (G/RPM 추천)](_deoknam/덕남%20모델%20개발/혼화응집공정/설계문서.md) ·
+  [착수공정 (응집공정 AI)](_deoknam/덕남%20모델%20개발/착수공정/설계문서.md) ·
+  [응집제 추천 v2](_deoknam/덕남%20모델%20개발/02_coag/응집제추천설계문서.md)
 - [덕남 군집분류 README](_deoknam/ml/01_clustering/deoknam_README.md)
 - [용연 군집분류 README](_yongyeon/ml/01_clustering/yongyeon_README.md)
 - [AI 운영화면 설계 프로토타입](static/AI정수장%20화면설계.html)

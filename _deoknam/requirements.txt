@@ -9,6 +9,17 @@ scikit-learn
 joblib
 numpy
 
+# 군집 실모델 DB 연동 (step_aiwtp MySQL)
+sqlalchemy
+pymysql
+
+# 모델 개발 파이프라인 (02_coag·03_dose_recommend·착수공정) — API 서버 이미지에는 불필요
+xgboost
+torch
+matplotlib
+scipy
+tabulate
+
 # 테스트
 pytest
 httpx

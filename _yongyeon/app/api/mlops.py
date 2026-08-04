@@ -55,14 +55,16 @@ async def model_performance(
     default_from = (now - timedelta(days=30)).date().isoformat()
     timeseries = [
         {"date": (now - timedelta(days=d)).date().isoformat(),
-         "metrics": {"MAPE": round(4.6 + 0.1 * (d % 3), 1), "R2": round(0.91 - 0.005 * (d % 4), 3)}}
+         "metrics": {"MAPE": round(4.6 + 0.1 * (d % 3), 1), "R2": round(0.91 - 0.005 * (d % 4), 3),
+                     "accuracy": round(100 - (4.6 + 0.1 * (d % 3)), 1)}}
         for d in range(6, -1, -1)
     ]
     return envelope({
         "model_id": modelId,
         "period": {"from": from_ or default_from, "to": to or now.date().isoformat()},
-        "metrics": {"MAE": 0.03, "RMSE": 0.05, "R2": 0.91, "MAPE": 4.6},
-        "pass_criteria": {"R2": 0.85, "MAPE": 5.0},
+        # accuracy(%, 높을수록 우수) = 100 − MAPE
+        "metrics": {"MAE": 0.03, "RMSE": 0.05, "R2": 0.91, "MAPE": 4.6, "accuracy": 95.4},
+        "pass_criteria": {"R2": 0.85, "MAPE": 5.0, "accuracy": 90.0},
         "passed": True,
         "timeseries": timeseries,
         "next_evaluation_at": (now + timedelta(days=13)).replace(
@@ -71,27 +73,39 @@ async def model_performance(
 
 
 @router.get("/models/{modelId}/drift")
-async def model_drift(modelId: str) -> dict:
-    """API-041 데이터/모델 드리프트 현황."""
+async def model_drift(
+    modelId: str,
+    period: str = Query("7d", description="추이 구간: 7d | 1m | quarter"),
+) -> dict:
+    """API-041 데이터/모델 드리프트 현황 (화면 3구간: 7일·1개월·분기)."""
     _get_model(modelId)
     now = now_kst()
+    # 구간별 (표본수, 스텝일수) — 분기/1개월은 주간 집계로 표본 수 유지
+    spec = {"7d": (7, 1), "1m": (5, 7), "quarter": (13, 7)}
+    n, step = spec.get(period, spec["7d"])
+    dth = state.mlops_settings["data_drift_threshold"]
     history = [
-        {"t": (now - timedelta(days=d)).date().isoformat(),
-         "data_drift_score": round(3.2 - 0.1 * d, 1),
-         "model_drift_score": round(1.8 - 0.1 * d, 1)}
-        for d in range(6, 0, -1)
+        {"t": (now - timedelta(days=step * d)).date().isoformat(),
+         "data_drift_score": round(3.2 - 0.08 * d, 2),
+         "model_drift_score": round(1.8 - 0.05 * d, 2)}
+        for d in range(n, 0, -1)
     ]
+    over = [h for h in history if h["data_drift_score"] > dth]
+    drift_periods = ([{"from": over[0]["t"], "to": over[-1]["t"], "type": "data_drift"}]
+                     if over else [])
     return envelope({
         "model_id": modelId,
+        "period": period,
         "data_drift_score": 3.2,
         "model_drift_score": 1.8,
         "status": "normal",
         "alarm": False,
         "thresholds": {
-            "data_drift": state.mlops_settings["data_drift_threshold"],
+            "data_drift": dth,
             "performance_drift": state.mlops_settings["performance_drift_threshold"],
         },
         "history": history,
+        "drift_periods": drift_periods,
     })
 
 
