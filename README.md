@@ -107,7 +107,6 @@ EPSEnE_water_treatment/
 ├── static/                          # UI 프로토타입 (공유 참고)
 │   └── AI정수장 화면설계.html
 ├── ISSUE_TEMPLATE/                  # 이슈 템플릿 (조직 공통)
-├── agent.md
 └── README.md                        # (본 문서)
 ```
 
@@ -173,7 +172,7 @@ EPSEnE_water_treatment/
 | `06_floc_rpm` | 혼화·플록형성 3단 RPM 규칙기반 추천엔진 (아래 상세) | 덕남 완료 |
 | `착수공정` | 응집공정 체류시간 정렬·과제A/B 모델 (intake_coag) | 덕남 완료 |
 
-**06_floc_rpm — 혼화·플록형성 G/RPM 추천엔진** ([설계문서](_deoknam/덕남%20모델%20개발/혼화응집공정/설계문서.md) §5~12 구현):
+**06_floc_rpm — 혼화·플록형성 G/RPM 추천엔진** (내부 설계문서 §5~12 구현):
 
 - 수온별 표준 RPM 룩업보간(표 2.3-13) + 목표 G^(2/3) 보정을 추천 기준으로,
   05의 K0 물리모델은 독립 검산(편차 경보 3%)으로 이중화
@@ -266,9 +265,7 @@ deoknam_cluster_classifier_20260517_v1.0.0
 
 - [API 설명서](API_GUIDE.md) · [API 접속 정보 (발주처 전달용)](API_ACCESS_INFO.md)
 - [덕남 사이트 안내](_deoknam/README.md) · [용연 사이트 안내](_yongyeon/README.md)
-- 설계문서: [혼화응집공정 (G/RPM 추천)](_deoknam/덕남%20모델%20개발/혼화응집공정/설계문서.md) ·
-  [착수공정 (응집공정 AI)](_deoknam/덕남%20모델%20개발/착수공정/설계문서.md) ·
-  [응집제 추천 v2](_deoknam/덕남%20모델%20개발/02_coag/응집제추천설계문서.md)
-- [덕남 군집분류 README](_deoknam/ml/01_clustering/deoknam_README.md)
-- [용연 군집분류 README](_yongyeon/ml/01_clustering/yongyeon_README.md)
+- 설계문서: [착수공정 (응집공정 AI)](_deoknam/덕남%20모델%20개발/착수공정/설계문서.md) ·
+  [응집제 추천 v2](_deoknam/덕남%20모델%20개발/02_coag/응집제추천설계문서.md) ·
+  [혼화응집공정 모델링 리포트](_deoknam/덕남%20모델%20개발/혼화응집공정/보고서/덕남_응집공정_모델링_리포트.md)
 - [AI 운영화면 설계 프로토타입](static/AI정수장%20화면설계.html)
